@@ -261,3 +261,39 @@ int inverse_kinematics(double *q_sols, double x, double y, double z) {
 
   return num_sols;
 }
+
+#include <iostream>
+
+int joint_jacobian(double *jacobian, double *q) {
+  // double q_delta[6] = {q[0], q[1], q[2], q[3], q[4], q[5]};
+  double delta = 0.0001; 
+
+  // double jacobian[6 * 3];
+  for (int i = 0; i < 6; i++) {
+    double q_delta[6] = {q[0], q[1], q[2], q[3], q[4], q[5]};
+    q_delta[i] = q[i] + delta;
+    auto [q1, q2, q3] = forward_kinematics(q);
+    auto [q1_delta, q2_delta, q3_delta] = forward_kinematics(q_delta);
+
+    jacobian[i * 3] = (q1_delta - q1) / delta;
+    jacobian[i * 3 + 1] = (q2_delta - q2) / delta;
+    jacobian[i * 3 + 2] = (q3_delta - q3) / delta;
+  }
+
+  // for (int i = 0; i < 6; i++) {
+  //   std::cout << jacobian[i * 3] << " ";
+  //   std::cout << jacobian[i * 3 +1] << " ";
+  //   std::cout << jacobian[i * 3 + 2] << " ";
+
+  //   std::cout << std::endl;
+
+  // }
+
+  // px = -(d_5 * (sin(x_1) * cos(x_2 + x_3 + x_4) - cos(x_1) * sin(x_2 + x_3 + x_4))) / 2 + (d_5 * (sin(x_1) * cos(x_2 + x_3 + x_4) + cos(x_1) * sin(x_2 + x_3 + x_4))) / 2 + d_4 * sin(x_1) - (d_6 * ( cos(x_1) * cos(x_2 + x_3 + x_4) - sin(x_1) * sin(x_2 + x_3 + x_4)) * sin(x_5)) / 2 - (d_6 * ( cos(x_1) * cos(x_2 + x_3 + x_4) + sin(x_1) * sin(x_2 + x_3 + x_4)) * sin(x_5)) / 2 + (a_2 * cos(x_1) * cos(x_2)) + (d_6 * cos(x_5) * sin(x_1)) + (a_3 * cos(x_1) * cos(x_2) * cos(x_3)) - (a_3 * cos(x_1) * sin(x_2) * sin(x_3))
+
+  // py = -(d_5 * (cos(x_1) * cos(x_2 + x_3 + x_4) - sin(x_1) * sin(x_2 + x_3 + x_4))) / 2 + (d_5 * (cos(x_1) * cos(x_2 + x_3 + x_4) + sin(x_1) * sin(x_2 + x_3 + x_4))) / 2 + d_4 * cos(x_1) - (d_6 * ( sin(x_1) * cos(x_2 + x_3 + x_4) - cos(x_1) * sin(x_2 + x_3 + x_4)) * sin(x_5)) / 2 - (d_6 * ( sin(x_1) * cos(x_2 + x_3 + x_4) + cos(x_1) * sin(x_2 + x_3 + x_4)) * sin(x_5)) / 2 - (d_6 * cos(x_1) * cos(x_5)) + (a_2 * cos(x_2) * sin(x_1)) + (a_3 * cos(x_2) * cos(x_3) * sin(x_1)) - (a_3 * sin(x_1) * sin(x_2) * sin(x_3))
+
+  // pz = d_1 + (d_6 * (cos(x_2 + x_3 + x_4) * cos(x_5) - sin(x_2 + x_3 + x_4) * sin(x_5))) / 2 + (a_3 * (sin(x_2) * cos(x_3) + cos(x_2) * sin(x_3))) + (a_2 * sin(x_2)) - (d_6 * (cos(x_2 + x_3 + x_4) * cos(x_5) + sin(x_2 + x_3 + x_4) * sin(x_5))) / 2 - (d_5 * cos(x_2 + x_3 + x_4))
+  
+  return 0;
+}

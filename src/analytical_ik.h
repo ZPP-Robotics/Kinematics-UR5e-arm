@@ -9,4 +9,6 @@ int inverse_kinematics_2PI(double *q_sols, double x, double y, double z);
 
 int inverse_kinematics(double *q_sols, double x, double y, double z);
 
+int joint_jacobian(double *jacobian, double *q);
+
 #endif  // ANALYTICAL_IK_H
