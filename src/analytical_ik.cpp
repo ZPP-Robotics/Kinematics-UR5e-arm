@@ -347,7 +347,7 @@ int joint_jacobian(double *jacobian, double *q) {
   // py = -(d5 * (cos1 * cos234 - sin1 * sin234)) / 2 + (d5 * (cos1 * cos234 + sin1 * sin234)) / 2 + d4 * cos1 - (d6 * ( sin1 * cos234 - cos1 * sin234) * sin5) / 2 - (d6 * ( sin1 * cos234 + cos1 * sin234) * sin5) / 2 - (d6 * cos1 * cos5) + (a2 * cos2 * sin1) + (a3 * cos2 * cos3 * sin1) - (a3 * sin1 * sin2 * sin3)
 
   // pz = d_1 + (d6 * (cos234 * cos5 - sin234 * sin5)) / 2 + (a3 * (sin2 * cos3 + cos2 * sin3)) + (a2 * sin2) - (d6 * (cos234 * cos5 + sin234 * sin5)) / 2 - (d5 * cos234)
-  q[0] -= ur_kinematics::PI;
+  // q[0] -= ur_kinematics::PI;
 
   ur_kinematics::jacobian(jacobian, q);
 
