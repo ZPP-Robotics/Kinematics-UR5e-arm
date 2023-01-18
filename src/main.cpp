@@ -144,9 +144,9 @@ void arm_controller(const mjModel_* mm, mjData_* dd) {
     arma::vec pos = {dd->site_xpos[0], dd->site_xpos[1], dd->site_xpos[2]};
 
     arma::vec err = (target - pos);
-    if (norm(err) < 0.05) return;
+    if (norm(err) < 0.005) return;
 
-    err = err / norm(err) * 0.005;
+    err = err / norm(err) * 0.001;
     arma::vec diff = pjac * err;
 
     for (int i = 0; i < 6; ++i) {
