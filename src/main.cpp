@@ -157,8 +157,23 @@ void arm_controller(const mjModel_* mm, mjData_* dd) {
 
 // main function
 int main(int argc, const char** argv) {
+    
+    double q_sols[8 * 6];
+    int num_sols = inverse_kinematics(q_sols, 0.1, 0.5, 0.6);
+
+    printf("Inverse solutions:\n");
+    for (int i=0; i < num_sols;i++) 
+        printf("%1.6f %1.6f %1.6f %1.6f %1.6f %1.6f\n", 
+             q_sols[i*6+0], q_sols[i*6+1], q_sols[i*6+2], q_sols[i*6+3], q_sols[i*6+4], q_sols[i*6+5]);
+
 
     double q[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    for (int i = 0; i < 6; ++i) {
+        q[i] = q_sols[i];
+        std::cout << q[i] << " ";
+    }
+    std::cout << "\n";
+
     auto [x, y, z] = forward_kinematics(q);
 
     std::cout << x << " " << y << " " << z << "\n";
