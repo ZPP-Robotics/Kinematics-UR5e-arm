@@ -13,12 +13,12 @@ namespace ur_kinematics {
 
     const double PI = M_PI;
 
-    const double d1 =  0.089159;
+    const double d1 =  0.16250;
     const double a2 = -0.42500;
-    const double a3 = -0.39225;
-    const double d4 =  0.10915;
-    const double d5 =  0.09465;
-    const double d6 =  0.0823;
+    const double a3 = 	-0.3922;
+    const double d4 =  0.1333;
+    const double d5 =  0.0997;
+    const double d6 =  	0.0996;
   }
 
   void forward(const double* q, double* T) {
