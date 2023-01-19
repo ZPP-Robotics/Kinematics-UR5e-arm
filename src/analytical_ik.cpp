@@ -298,14 +298,17 @@ namespace ur_kinematics {
 
 std::tuple<double, double, double> forward_kinematics(double *q) {
   double *T = new double[16];
+  for(auto i = 0; i < 16; i++)
+    T[i] = 0.0;
   ur_kinematics::forward(q, T);
-
-  return {T[0*4 + 3], T[1*4 + 3], T[2*4 + 3]};
+  double x = T[0*4 + 3], y=T[1*4 + 3], z=T[2*4 + 3];
+  delete[] T;
+  return {x, y, z};
 }
 
 int inverse_kinematics_2PI(double *q_sols, double x, double y, double z) {
   double q[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-  double *T = new double[16];
+  double *T = new double[16]{0};
   ur_kinematics::forward(q, T);
 
   std::tuple<double, double, double> target = {x, y, z};
@@ -315,7 +318,7 @@ int inverse_kinematics_2PI(double *q_sols, double x, double y, double z) {
 
   int num_sols;
   num_sols = ur_kinematics::inverse(T, q_sols);
-
+  free(T);
   // for (int i = 0; i < num_sols; i++)
   //   q_sols[i * 6] -= ur_kinematics::PI / 2; 
 
@@ -325,6 +328,8 @@ int inverse_kinematics_2PI(double *q_sols, double x, double y, double z) {
 int inverse_kinematics(double *q_sols, double x, double y, double z) {
   double q[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   double *T = new double[16];
+  for(auto i = 0; i < 16; i++)
+    T[i] = 0.0;
   ur_kinematics::forward(q, T);
 
   std::tuple<double, double, double> target = {x, y, z};
@@ -334,7 +339,7 @@ int inverse_kinematics(double *q_sols, double x, double y, double z) {
 
   int num_sols;
   num_sols = ur_kinematics::inverse(T, q_sols);
-
+  delete[] T;
   // for (int i = 0; i < num_sols; i++)
   //   q_sols[i * 6] -= ur_kinematics::PI / 2; 
 
