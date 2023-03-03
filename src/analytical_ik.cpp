@@ -45,6 +45,24 @@ namespace ur_kinematics {
     *T = 0.0; T++; *T = 0.0; T++; *T = 0.0; T++; *T = 1.0;
   }
 
+  void forward_elbow_joint(const double* q, double* T) {
+    const double s1 = sin(*q), c1 = cos(*q); q++; 
+    const double s2 = sin(*q), c2 = cos(*q); q++;
+    *T = c1*c2; T++;
+    *T = -s2*c1; T++;
+    *T = s1; T++;
+    *T = a2*c1*c2; T++;
+    *T = c2*s1; T++;
+    *T = -s2*s1; T++;
+    *T = -c1; T++;
+    *T = a2*c2*s1; T++;
+    *T = s2; T++;
+    *T = c2; T++;
+    *T = 0.0; T++;
+    *T = a2*s2 + d1; T++;
+    *T = 0.0; T++; *T = 0.0; T++; *T = 0.0; T++; *T = 1.0;
+  }
+
   int inverse(const double* T, double* q_sols,  double q6_des=0.0) {
     int num_sols = 0;
     double T02 = -*T; T++; double T00 =  *T; T++; double T01 =  *T; T++; double T03 = -*T; T++; 
@@ -211,6 +229,32 @@ namespace ur_kinematics {
     return num_sols;
   }
 
+  void jacobian_elbow_joint(double *jacobian, double *q) {
+    const double s1 = sin(*q), c1 = cos(*q); q++; 
+    const double s2 = sin(*q), c2 = cos(*q); q++;
+
+    jacobian[0 * 6 + 0] = -a2 * s1 * c2;
+    jacobian[0 * 6 + 1] = -a2 * s2 * c1;
+    jacobian[0 * 6 + 2] = 0.0;
+    jacobian[0 * 6 + 3] = 0.0;
+    jacobian[0 * 6 + 4] = 0.0;
+    jacobian[0 * 6 + 5] = 0.0;
+
+    jacobian[1 * 6 + 0] = a2 * c1 * c2;
+    jacobian[1 * 6 + 1] = -a2 * s1 * s2;
+    jacobian[1 * 6 + 2] = 0.0;
+    jacobian[1 * 6 + 3] = 0.0;
+    jacobian[1 * 6 + 4] = 0.0;
+    jacobian[1 * 6 + 5] = 0.0;
+
+    jacobian[2 * 6 + 0] = 0.0;
+    jacobian[2 * 6 + 1] = a2 * c2;
+    jacobian[2 * 6 + 2] = 0.0;
+    jacobian[2 * 6 + 3] = 0.0;
+    jacobian[2 * 6 + 4] = 0.0;
+    jacobian[2 * 6 + 5] = 0.0;
+  }
+
   void jacobian(double *jacobian, double *q) {
     const double cos1 = cos(q[0]);
     const double cos2 = cos(q[1]);
@@ -306,6 +350,19 @@ std::tuple<double, double, double> forward_kinematics(double *q) {
   return {x, y, z};
 }
 
+std::tuple<double, double, double> forward_kinematics_elbow_joint(double *q) {
+  double *T = new double[16];
+  for(auto i = 0; i < 16; i++)
+    T[i] = 0.0;
+  // Magic!
+  // Need to add PI to q1
+  q[0] += ur_kinematics::PI;
+  ur_kinematics::forward_elbow_joint(q, T);
+  double x = T[0*4 + 3], y=T[1*4 + 3], z=T[2*4 + 3];
+  delete[] T;
+  return {x, y, z};
+}
+
 int inverse_kinematics_2PI(double *q_sols, double x, double y, double z) {
   double q[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   double *T = new double[16]{0};
@@ -351,9 +408,7 @@ int inverse_kinematics(double *q_sols, double x, double y, double z) {
   return num_sols;
 }
 
-#include <iostream>
-
-int joint_jacobian(double *jacobian, double *q) {
+void joint_jacobian(double *jacobian, double *q) {
   // double q_delta[6] = {q[0], q[1], q[2], q[3], q[4], q[5]};
   // double delta = 0.0001; 
 
@@ -386,6 +441,10 @@ int joint_jacobian(double *jacobian, double *q) {
   q[0] += ur_kinematics::PI;
 
   ur_kinematics::jacobian(jacobian, q);
+}
 
-  return 0;
+void jacobian_elbow_joint(double *jacobian, double *q) {
+  q[0] += ur_kinematics::PI;
+
+  ur_kinematics::jacobian_elbow_joint(jacobian, q);
 }
