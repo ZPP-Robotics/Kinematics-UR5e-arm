@@ -131,7 +131,7 @@ void arm_controller(const mjModel_* mm, mjData_* dd) {
 
     // double jactmp[18] = {};
 
-    auto res = joint_jacobian(jactmp, q);
+    jacobian_elbow_joint(jactmp, q);
     // mj_jacSite(mm, dd, jactmp, nullptr, 0);
 
     // auto test = arma::mat{jactmp, 6, 3};
@@ -140,8 +140,9 @@ void arm_controller(const mjModel_* mm, mjData_* dd) {
     // }
 
     arma::mat pjac = pinv(arma::mat{jactmp, 6, 3}.t());
-    arma::vec target{0.1, 0.5, 0.6};
-    arma::vec pos = {dd->site_xpos[0], dd->site_xpos[1], dd->site_xpos[2]};
+    arma::vec target{0.3, 0.3, 0.3};
+    arma::vec pos = {dd->xpos[4*3], dd->xpos[4*3 + 2], dd->xpos[4*3 + 2]};
+    // arma::vec pos = {dd->site_xpos[0], dd->site_xpos[1], dd->site_xpos[2]};
 
     arma::vec err = (target - pos);
     if (norm(err) < 0.005) return;
@@ -149,7 +150,7 @@ void arm_controller(const mjModel_* mm, mjData_* dd) {
     err = err / norm(err) * 0.001;
     arma::vec diff = pjac * err;
 
-    for (int i = 0; i < 6; ++i) {
+    for (int i = 0; i < 2; ++i) {
         dd->ctrl[i] += diff[i];
     }
 }
@@ -159,7 +160,7 @@ void arm_controller(const mjModel_* mm, mjData_* dd) {
 int main(int argc, const char** argv) {
     
     double q_sols[8 * 6];
-    int num_sols = inverse_kinematics(q_sols, 0.1, 0.5, 0.6);
+    int num_sols = inverse_kinematics(q_sols, 0.5, 0.5, 0.5);
 
     printf("Inverse solutions:\n");
     for (int i=0; i < num_sols;i++) 
@@ -174,7 +175,7 @@ int main(int argc, const char** argv) {
     }
     std::cout << "\n";
 
-    auto [x, y, z] = forward_kinematics(q);
+    auto [x, y, z] = forward_kinematics_elbow_joint(q);
 
     std::cout << x << " " << y << " " << z << "\n";
 
