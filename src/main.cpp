@@ -97,32 +97,89 @@ void scroll(GLFWwindow* window, double xoffset, double yoffset) {
 }
 
 // arm control to target
-bool arm_controller(const mjModel_* mm, mjData_* dd, std::tuple<double, double, double> target) {
-    // set target
-    mm->geom_pos[0] = std::get<0>(target);
-    mm->geom_pos[1] = std::get<1>(target);
-    mm->geom_pos[2] = std::get<2>(target);
+// bool arm_controller(const mjModel_* mm, mjData_* dd, std::tuple<double, double, double> target) {
+//     // set target
+//     mm->geom_pos[0] = std::get<0>(target);
+//     mm->geom_pos[1] = std::get<1>(target);
+//     mm->geom_pos[2] = std::get<2>(target);
 
+//     double q_sols[8 * 6];
+//     int num_sols = inverse_kinematics(q_sols, std::get<0>(target), std::get<1>(target), std::get<2>(target));
+
+//     if (num_sols == 0)
+//         return false;
+
+//     printf("Inverse solutions:\n");
+//     for (int i=0; i < num_sols;i++) 
+//         printf("%1.6f %1.6f %1.6f %1.6f %1.6f %1.6f\n", 
+//              q_sols[i*6+0], q_sols[i*6+1], q_sols[i*6+2], q_sols[i*6+3], q_sols[i*6+4], q_sols[i*6+5]);
+
+//     for (int i = 0; i < 6; ++i) {
+//         dd->ctrl[i] = q_sols[i];
+//     }
+
+//     return true;
+// }
+
+void arm_controller(const mjModel_* mm, mjData_* dd) {
+    double jactmp[18] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    double q[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+    for (int i = 0; i < 6; ++i) {
+        q[i] = dd->ctrl[i];
+    }
+
+    // double jactmp[18] = {};
+
+    jacobian_elbow_joint(jactmp, q);
+    // mj_jacSite(mm, dd, jactmp, nullptr, 0);
+
+    // auto test = arma::mat{jactmp, 6, 3};
+    // for (int i = 0; i < ; i++) {
+    //     cout << 
+    // }
+
+    arma::mat pjac = pinv(arma::mat{jactmp, 6, 3}.t());
+    arma::vec target{0.3, 0.3, 0.3};
+    arma::vec pos = {dd->xpos[4*3], dd->xpos[4*3 + 2], dd->xpos[4*3 + 2]};
+    // arma::vec pos = {dd->site_xpos[0], dd->site_xpos[1], dd->site_xpos[2]};
+
+    arma::vec err = (target - pos);
+    if (norm(err) < 0.005) return;
+
+    err = err / norm(err) * 0.001;
+    arma::vec diff = pjac * err;
+
+    for (int i = 0; i < 2; ++i) {
+        dd->ctrl[i] += diff[i];
+    }
+}
+
+
+// main function
+int main(int argc, const char** argv) {
+    
     double q_sols[8 * 6];
-    int num_sols = inverse_kinematics(q_sols, std::get<0>(target), std::get<1>(target), std::get<2>(target));
-
-    if (num_sols == 0)
-        return false;
+    int num_sols = inverse_kinematics(q_sols, 0.5, 0.5, 0.5);
 
     printf("Inverse solutions:\n");
     for (int i=0; i < num_sols;i++) 
         printf("%1.6f %1.6f %1.6f %1.6f %1.6f %1.6f\n", 
              q_sols[i*6+0], q_sols[i*6+1], q_sols[i*6+2], q_sols[i*6+3], q_sols[i*6+4], q_sols[i*6+5]);
 
+
+    double q[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     for (int i = 0; i < 6; ++i) {
-        dd->ctrl[i] = q_sols[i];
+        q[i] = q_sols[i];
+        std::cout << q[i] << " ";
     }
+    std::cout << "\n";
 
-    return true;
-}
+    auto [x, y, z] = forward_kinematics_elbow_joint(q);
 
-// main function
-int main(int argc, const char** argv) {
+    std::cout << x << " " << y << " " << z << "\n";
+
+
     // default targe position
     double target_x = 0.0;
     double target_y = 0.0;
@@ -179,12 +236,18 @@ int main(int argc, const char** argv) {
     glfwSetMouseButtonCallback(window, mouse_button);
     glfwSetScrollCallback(window, scroll);
 
-    // count inverse kinematics for our arm
-    if (!arm_controller(m, d, {target_x, target_y, target_z})) {
-        std::cerr << "No inverse kinematics solution!\n";
-        return 0;
-    }
-        
+    // m->opt.collision = mjCOL_PAIR;
+    // // count inverse kinematics for our arm
+    // if (!arm_controller(m, d, {target_x, target_y, target_z})) {
+    //     std::cerr << "No inverse kinematics solution!\n";
+    //     return 0;
+    // }
+    // set target
+    m->geom_pos[0] = target_x;
+    m->geom_pos[1] = target_y;
+    m->geom_pos[2] = target_z;
+
+    mjcb_control = arm_controller;
     m->opt.collision = mjCOL_PAIR; // DYNAMIC - with collisions
 
     // run main loop, target real-time simulation and 60 fps rendering

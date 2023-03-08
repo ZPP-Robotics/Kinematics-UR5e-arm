@@ -1,0 +1,4 @@
+build*
+bin*
+.vscode*
+inverse_kinematics_mujoco
