@@ -30,19 +30,37 @@ namespace ur_kinematics {
     double s6 = sin(*q), c6 = cos(*q); 
     double s23 = sin(q23), c23 = cos(q23);
     double s234 = sin(q234), c234 = cos(q234);
-    *T = c234*c1*s5 - c5*s1; T++;
-    *T = c6*(s1*s5 + c234*c1*c5) - s234*c1*s6; T++;
-    *T = -s6*(s1*s5 + c234*c1*c5) - s234*c1*c6; T++;
-    *T = d6*c234*c1*s5 - a3*c23*c1 - a2*c1*c2 - d6*c5*s1 - d5*s234*c1 - d4*s1; T++;
-    *T = c1*c5 + c234*s1*s5; T++;
-    *T = -c6*(c1*s5 - c234*c5*s1) - s234*s1*s6; T++;
-    *T = s6*(c1*s5 - c234*c5*s1) - s234*c6*s1; T++;
-    *T = d6*(c1*c5 + c234*s1*s5) + d4*c1 - a3*c23*s1 - a2*c2*s1 - d5*s234*s1; T++;
-    *T = -s234*s5; T++;
-    *T = -c234*s6 - s234*c5*c6; T++;
-    *T = s234*c5*s6 - c234*c6; T++;
-    *T = d1 + a3*s23 + a2*s2 - d5*(c23*c4 - s23*s4) - d6*s5*(c23*s4 + s23*c4); T++;
+
+    *T = (s1*s2 + c1*c5*c234)*c6 - s6*s234*c1; T++;
+    *T = -(s1*s5 + c1*c5*c234)*s6 - s234*c1*c6; T++;
+    *T = s1*s5 - s5*c1*c234; T++;
+    *T = a2*c1*c2 + a3*c1*c23 + d4*s1 + d5*s234*c1 + d6*s1*c5 - d6*s5*c1*c234; T++;
+
+    *T = (s1*c5*c234 - s5*c1) * c6 - s1*s6*s234; T++;
+    *T = (-s1*c5*c234 + s5*c1)*c6 - s1*s234*c6; T++;
+    *T = -s1*s5*c234 - c1*c5; T++;
+    *T = a2*s1*c2 + a3*s1*c23 - d4*c1 + d5*s1*s234 - d6*s1*s5*c234 - d6*c1*c5; T++;
+
+    *T = s6*c234 + s234*c5*c6; T++;
+    *T = -s6*s234*c5 + c6*c234; T++;
+    *T = -s5*s234; T++;
+    *T = a2*s2 + a3*s23 + d1 - d5*c234 - d6*s5*s234; T++;
+
     *T = 0.0; T++; *T = 0.0; T++; *T = 0.0; T++; *T = 1.0;
+
+    // *T = c234*c1*s5 - c5*s1; T++;
+    // *T = c6*(s1*s5 + c234*c1*c5) - s234*c1*s6; T++;
+    // *T = -s6*(s1*s5 + c234*c1*c5) - s234*c1*c6; T++;
+    // *T = d6*c234*c1*s5 - a3*c23*c1 - a2*c1*c2 - d6*c5*s1 - d5*s234*c1 - d4*s1; T++;
+    // *T = c1*c5 + c234*s1*s5; T++;
+    // *T = -c6*(c1*s5 - c234*c5*s1) - s234*s1*s6; T++;
+    // *T = s6*(c1*s5 - c234*c5*s1) - s234*c6*s1; T++;
+    // *T = d6*(c1*c5 + c234*s1*s5) + d4*c1 - a3*c23*s1 - a2*c2*s1 - d5*s234*s1; T++;
+    // *T = -s234*s5; T++;
+    // *T = -c234*s6 - s234*c5*c6; T++;
+    // *T = s234*c5*s6 - c234*c6; T++;
+    // *T = d1 + a3*s23 + a2*s2 - d5*(c23*c4 - s23*s4) - d6*s5*(c23*s4 + s23*c4); T++;
+    // *T = 0.0; T++; *T = 0.0; T++; *T = 0.0; T++; *T = 1.0;
   }
 
   void forward_elbow_joint(const double* q, double* T) {
@@ -274,25 +292,25 @@ namespace ur_kinematics {
     const double sin234 = sin(q[1] + q[2] + q[3]);
     const double cos234 = cos(q[1] + q[2] + q[3]);
 
-    jacobian[0 * 6 + 0] = -(d5 * (cos1 * cos234 + sin1 * sin234)) / 2 + (d5 * ( cos1 * cos234 - sin1 * sin234)) / 2 + d4 * cos1 - (d6 * (-sin1 * cos234 - cos1 * sin234) * sin5) / 2 - (d6 * ( -sin1 * cos234 + cos1 * sin234) * sin5) / 2 - (a2 * sin1 * cos2) + (d6 * cos5 * cos1) - (a3 * sin1 * cos2 * cos3) + (a3 * sin1 * sin2 * sin3);
-    jacobian[0 * 6 + 1] = (d5 * (sin1 * sin234 + cos1 * cos234)) / 2 + (d5 * (-sin1 * sin234 + cos1 * cos234)) / 2 - (d6 * (-cos1 * sin234 - sin1 * cos234) * sin5) / 2 - (d6 * ( -cos1 * sin234 + sin1 * cos234) * sin5) / 2 - (a2 * cos1 * sin2) - (a3 * cos1 * sin2 * cos3) - (a3 * cos1 * cos2 * sin3);
-    jacobian[0 * 6 + 2] = (d5 * (sin1 * sin234 + cos1 * cos234)) / 2 + (d5 * (-sin1 * sin234 + cos1 * cos234)) / 2 - (d6 * (-cos1 * sin234 - sin1 * cos234) * sin5) / 2 - (d6 * ( -cos1 * sin234 + sin1 * cos234) * sin5) / 2 - (a3 * cos1 * cos2 * sin3) - (a3 * cos1 * sin2 * cos3);
-    jacobian[0 * 6 + 3] = (d5 * (sin1 * sin234 + cos1 * cos234)) / 2 + (d5 * (-sin1 * sin234 + cos1 * cos234)) / 2 - (d6 * (-cos1 * sin234 - sin1 * cos234) * sin5) / 2 - (d6 * ( -cos1 * sin234 + sin1 * cos234) * sin5) / 2;
-    jacobian[0 * 6 + 4] = -(d6 * ( cos1 * cos234 - sin1 * sin234) * cos5) / 2 - (d6 * ( cos1 * cos234 + sin1 * sin234) * cos5) / 2 - (d6 * sin5 * sin1);
+    jacobian[0 * 6 + 0] = -a2*sin1*cos2 - a3*sin1*cos23 + d4*cos1 - d5*sin1*sin234 + d6*sin1*sin5*cos234 + d6*cos1*cos5;
+    jacobian[0 * 6 + 1] = (-a2*sin2 - a3*sin23 + d5*cos234 + d6*sin5*sin234)*cos1;
+    jacobian[0 * 6 + 2] = (-a3*sin23 + d5*cos234 + d6*sin5*sin234)*cos1;
+    jacobian[0 * 6 + 3] = (d5*cos234 + d6*sin5*sin234)*cos1;
+    jacobian[0 * 6 + 4] = -d6*(sin1*sin5 + cos1*cos5*cos234);
     jacobian[0 * 6 + 5] = 0;
 
-    jacobian[1 * 6 + 0] = (d5 * (sin1 * cos234 + cos1 * sin234)) / 2 + (d5 * (-sin1 * cos234 + cos1 * sin234)) / 2 - d4 * sin1 - (d6 * ( cos1 * cos234 + sin1 * sin234) * sin5) / 2 - (d6 * ( cos1 * cos234 - sin1 * sin234) * sin5) / 2 + (d6 * sin1 * cos5) + (a2 * cos2 * cos1) + (a3 * cos2 * cos3 * cos1) - (a3 * cos1 * sin2 * sin3);
-    jacobian[1 * 6 + 1] = (d5 * (cos1 * sin234 + sin1 * cos234)) / 2 + (d5 * (-cos1 * sin234 + sin1 * cos234)) / 2 - (d6 * (-sin1 * sin234 - cos1 * cos234) * sin5) / 2 - (d6 * (-sin1 * sin234 + cos1 * cos234) * sin5) / 2 - (a2 * sin2 * sin1) - (a3 * sin2 * cos3 * sin1) - (a3 * sin1 * cos2 * sin3);
-    jacobian[1 * 6 + 2] = (d5 * (cos1 * sin234 + sin1 * cos234)) / 2 + (d5 * (-cos1 * sin234 + sin1 * cos234)) / 2 - (d6 * (-sin1 * sin234 - cos1 * cos234) * sin5) / 2 - (d6 * (-sin1 * sin234 + cos1 * cos234) * sin5) / 2 - (a3 * cos2 * sin3 * sin1) - (a3 * sin1 * sin2 * cos3);
-    jacobian[1 * 6 + 3] = (d5 * (cos1 * sin234 + sin1 * cos234)) / 2 + (d5 * (-cos1 * sin234 + sin1 * cos234)) / 2 - (d6 * (-sin1 * sin234 - cos1 * cos234) * sin5) / 2 - (d6 * (-sin1 * sin234 + cos1 * cos234) * sin5) / 2;
-    jacobian[1 * 6 + 4] = -(d6 * ( sin1 * cos234 - cos1 * sin234) * cos5) / 2 - (d6 * ( sin1 * cos234 + cos1 * sin234) * cos5) / 2 + (d6 * cos1 * sin5);
+    jacobian[1 * 6 + 0] = a2*cos1*cos2 + a3*cos1*cos23 + d4*sin1 + d5*sin234*cos1 + d6*sin1*cos5 - d6*sin5*cos1*cos234;
+    jacobian[1 * 6 + 1] = (-a2*sin2 - a3*sin23 + d5*cos234 + d6*sin5*sin234)*sin1;
+    jacobian[1 * 6 + 2] = (-a3*sin23 + d5*cos234 + d6*sin5*sin234)*sin1;
+    jacobian[1 * 6 + 3] = (d5*cos234 + d6*sin5*sin234)*sin1;
+    jacobian[1 * 6 + 4] = d6*(-sin1*cos5*cos234 + sin5*cos1);
     jacobian[1 * 6 + 5] = 0;
 
     jacobian[2 * 6 + 0] = 0;
-    jacobian[2 * 6 + 1] = (d6 * (sin234 * (-cos5) - sin5 * cos234)) / 2 + a2 * cos2 + a3 * (cos2 * cos3 - sin2 * sin3) - (d6 * (sin5 * cos234 - sin234 * cos5)) / 2 + d6 * sin234;
-    jacobian[2 * 6 + 2] = (d6 * (sin234 * (-cos5) - sin5 * cos234)) / 2 + a3 * (cos2 * cos3 - sin2 * sin3) - (d6 * (sin5 * cos234 - sin234 * cos5)) / 2 + d6 * sin234;
-    jacobian[2 * 6 + 3] = (d6 * (sin234 * (-cos5) - sin5 * cos234)) / 2 - (d6 * (sin5 * cos234 - sin234 * cos5)) / 2 + d6 * sin234;
-    jacobian[2 * 6 + 4] = (d6 * (sin234 * (-cos5) - sin5 * cos234)) / 2 - (d6 * (sin234 * cos5 - sin5 * cos234)) / 2 ;
+    jacobian[2 * 6 + 1] = a2*cos2 + a3*cos23 + d5*sin234 - d6*sin5*cos234;
+    jacobian[2 * 6 + 2] = a3*cos23 + d5*sin234 - d6*sin5*cos234;
+    jacobian[2 * 6 + 3] = d5*sin234 - d6*sin5*cos234;
+    jacobian[2 * 6 + 4] = -d6*sin234*cos5;
     jacobian[2 * 6 + 5] = 0;
 
   }
@@ -317,7 +335,7 @@ std::tuple<double, double, double> forward_kinematics_elbow_joint(double *q) {
 
   // Magic!
   // Need to add PI to q1
-  q[0] += ur_kinematics::PI;
+  // q[0] += ur_kinematics::PI;
   ur_kinematics::forward_elbow_joint(q, T);
 
   double x = T[0*4 + 3], y = T[1*4 + 3], z = T[2*4 + 3];
@@ -367,11 +385,11 @@ int inverse_kinematics(double *q_sols, double x, double y, double z) {
 }
 
 void joint_jacobian(double *jacobian, double *q) {
-  q[0] += ur_kinematics::PI;
+  // q[0] += ur_kinematics::PI;
   ur_kinematics::jacobian(jacobian, q);
 }
 
 void jacobian_elbow_joint(double *jacobian, double *q) {
-  q[0] += ur_kinematics::PI;
+  // q[0] += ur_kinematics::PI;
   ur_kinematics::jacobian_elbow_joint(jacobian, q);
 }
