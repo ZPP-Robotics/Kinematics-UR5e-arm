@@ -13,6 +13,3 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
   endif()
 
 endif()
-
-# file(GLOB SOURCES sources src/*)
-# add_executable(example src/analytical_ik.cpp ${SOURCES})
