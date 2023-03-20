@@ -325,7 +325,7 @@ std::tuple<double, double, double> forward_kinematics_elbow_joint(double *q) {
 
   // Magic!
   // Need to add PI to q1
-  // q[0] += ur_kinematics::PI;
+  q[0] += ur_kinematics::PI;
   ur_kinematics::forward_elbow_joint(q, T);
 
   double x = T[0*4 + 3], y = T[1*4 + 3], z = T[2*4 + 3];
@@ -378,11 +378,11 @@ int inverse_kinematics(double *q_sols, double x, double y, double z) {
 }
 
 void joint_jacobian(double *jacobian, double *q) {
-  // q[0] += ur_kinematics::PI;
+  q[0] += ur_kinematics::PI;
   ur_kinematics::jacobian(jacobian, q);
 }
 
 void jacobian_elbow_joint(double *jacobian, double *q) {
-  // q[0] += ur_kinematics::PI;
+  q[0] += ur_kinematics::PI;
   ur_kinematics::jacobian_elbow_joint(jacobian, q);
 }
