@@ -378,7 +378,7 @@ int inverse_kinematics(double *q_sols, double x, double y, double z) {
 }
 
 void joint_jacobian(double *jacobian, double *q) {
-  q[0] += ur_kinematics::PI;
+  // q[0] += ur_kinematics::PI;
   ur_kinematics::jacobian(jacobian, q);
 }
 
