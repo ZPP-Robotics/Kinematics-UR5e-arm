@@ -22,29 +22,6 @@ namespace ur_kinematics {
   }
 
   void forward(const double* q, double* T) {
-    double s1 = sin(*q), c1 = cos(*q); q++;
-    double q23 = *q, q234 = *q, s2 = sin(*q), c2 = cos(*q); q++;
-    double s3 = sin(*q), c3 = cos(*q); q23 += *q; q234 += *q; q++;
-    double s4 = sin(*q), c4 = cos(*q); q234 += *q; q++;
-    double s5 = sin(*q), c5 = cos(*q); q++;
-    double s6 = sin(*q), c6 = cos(*q); 
-    double s23 = sin(q23), c23 = cos(q23);
-    double s234 = sin(q234), c234 = cos(q234);
-    *T = c234*c1*s5 - c5*s1; T++;
-    *T = c6*(s1*s5 + c234*c1*c5) - s234*c1*s6; T++;
-    *T = -s6*(s1*s5 + c234*c1*c5) - s234*c1*c6; T++;
-    *T = d6*c234*c1*s5 - a3*c23*c1 - a2*c1*c2 - d6*c5*s1 - d5*s234*c1 - d4*s1; T++;
-    *T = c1*c5 + c234*s1*s5; T++;
-    *T = -c6*(c1*s5 - c234*c5*s1) - s234*s1*s6; T++;
-    *T = s6*(c1*s5 - c234*c5*s1) - s234*c6*s1; T++;
-    *T = d6*(c1*c5 + c234*s1*s5) + d4*c1 - a3*c23*s1 - a2*c2*s1 - d5*s234*s1; T++;
-    *T = -s234*s5; T++;
-    *T = -c234*s6 - s234*c5*c6; T++;
-    *T = s234*c5*s6 - c234*c6; T++;
-    *T = d1 + a3*s23 + a2*s2 - d5*(c23*c4 - s23*s4) - d6*s5*(c23*s4 + s23*c4); T++;
-    *T = 0.0; T++; *T = 0.0; T++; *T = 0.0; T++; *T = 1.0;
-
-    // sympy
     // double s1 = sin(*q), c1 = cos(*q); q++;
     // double q23 = *q, q234 = *q, s2 = sin(*q), c2 = cos(*q); q++;
     // double s3 = sin(*q), c3 = cos(*q); q23 += *q; q234 += *q; q++;
@@ -53,23 +30,46 @@ namespace ur_kinematics {
     // double s6 = sin(*q), c6 = cos(*q); 
     // double s23 = sin(q23), c23 = cos(q23);
     // double s234 = sin(q234), c234 = cos(q234);
-
-    // *T = (s1*s2 + c1*c5*c234)*c6 - s6*s234*c1; T++;
-    // *T = -(s1*s5 + c1*c5*c234)*s6 - s234*c1*c6; T++;
-    // *T = s1*s5 - s5*c1*c234; T++;
-    // *T = a2*c1*c2 + a3*c1*c23 + d4*s1 + d5*s234*c1 + d6*s1*c5 - d6*s5*c1*c234; T++;
-
-    // *T = (s1*c5*c234 - s5*c1) * c6 - s1*s6*s234; T++;
-    // *T = (-s1*c5*c234 + s5*c1)*c6 - s1*s234*c6; T++;
-    // *T = -s1*s5*c234 - c1*c5; T++;
-    // *T = a2*s1*c2 + a3*s1*c23 - d4*c1 + d5*s1*s234 - d6*s1*s5*c234 - d6*c1*c5; T++;
-
-    // *T = s6*c234 + s234*c5*c6; T++;
-    // *T = -s6*s234*c5 + c6*c234; T++;
-    // *T = -s5*s234; T++;
-    // *T = a2*s2 + a3*s23 + d1 - d5*c234 - d6*s5*s234; T++;
-
+    // *T = c234*c1*s5 - c5*s1; T++;
+    // *T = c6*(s1*s5 + c234*c1*c5) - s234*c1*s6; T++;
+    // *T = -s6*(s1*s5 + c234*c1*c5) - s234*c1*c6; T++;
+    // *T = d6*c234*c1*s5 - a3*c23*c1 - a2*c1*c2 - d6*c5*s1 - d5*s234*c1 - d4*s1; T++;
+    // *T = c1*c5 + c234*s1*s5; T++;
+    // *T = -c6*(c1*s5 - c234*c5*s1) - s234*s1*s6; T++;
+    // *T = s6*(c1*s5 - c234*c5*s1) - s234*c6*s1; T++;
+    // *T = d6*(c1*c5 + c234*s1*s5) + d4*c1 - a3*c23*s1 - a2*c2*s1 - d5*s234*s1; T++;
+    // *T = -s234*s5; T++;
+    // *T = -c234*s6 - s234*c5*c6; T++;
+    // *T = s234*c5*s6 - c234*c6; T++;
+    // *T = d1 + a3*s23 + a2*s2 - d5*(c23*c4 - s23*s4) - d6*s5*(c23*s4 + s23*c4); T++;
     // *T = 0.0; T++; *T = 0.0; T++; *T = 0.0; T++; *T = 1.0;
+
+    // sympy
+    double s1 = sin(*q), c1 = cos(*q); q++;
+    double q23 = *q, q234 = *q, s2 = sin(*q), c2 = cos(*q); q++;
+    double s3 = sin(*q), c3 = cos(*q); q23 += *q; q234 += *q; q++;
+    double s4 = sin(*q), c4 = cos(*q); q234 += *q; q++;
+    double s5 = sin(*q), c5 = cos(*q); q++;
+    double s6 = sin(*q), c6 = cos(*q); 
+    double s23 = sin(q23), c23 = cos(q23);
+    double s234 = sin(q234), c234 = cos(q234);
+
+    *T = (s1*s2 + c1*c5*c234)*c6 - s6*s234*c1; T++;
+    *T = -(s1*s5 + c1*c5*c234)*s6 - s234*c1*c6; T++;
+    *T = s1*s5 - s5*c1*c234; T++;
+    *T = a2*c1*c2 + a3*c1*c23 + d4*s1 + d5*s234*c1 + d6*s1*c5 - d6*s5*c1*c234; T++;
+
+    *T = (s1*c5*c234 - s5*c1) * c6 - s1*s6*s234; T++;
+    *T = (-s1*c5*c234 + s5*c1)*c6 - s1*s234*c6; T++;
+    *T = -s1*s5*c234 - c1*c5; T++;
+    *T = a2*s1*c2 + a3*s1*c23 - d4*c1 + d5*s1*s234 - d6*s1*s5*c234 - d6*c1*c5; T++;
+
+    *T = s6*c234 + s234*c5*c6; T++;
+    *T = -s6*s234*c5 + c6*c234; T++;
+    *T = -s5*s234; T++;
+    *T = a2*s2 + a3*s23 + d1 - d5*c234 - d6*s5*s234; T++;
+
+    *T = 0.0; T++; *T = 0.0; T++; *T = 0.0; T++; *T = 1.0;
   }
 
   void forward_elbow_joint(const double* q, double* T) {
@@ -325,7 +325,7 @@ std::tuple<double, double, double> forward_kinematics_elbow_joint(double *q) {
 
   // Magic!
   // Need to add PI to q1
-  q[0] += ur_kinematics::PI;
+  // q[0] += ur_kinematics::PI;
   ur_kinematics::forward_elbow_joint(q, T);
 
   double x = T[0*4 + 3], y = T[1*4 + 3], z = T[2*4 + 3];
@@ -378,11 +378,11 @@ int inverse_kinematics(double *q_sols, double x, double y, double z) {
 }
 
 void joint_jacobian(double *jacobian, double *q) {
-  q[0] += ur_kinematics::PI;
+  // q[0] += ur_kinematics::PI;
   ur_kinematics::jacobian(jacobian, q);
 }
 
 void jacobian_elbow_joint(double *jacobian, double *q) {
-  q[0] += ur_kinematics::PI;
+  // q[0] += ur_kinematics::PI;
   ur_kinematics::jacobian_elbow_joint(jacobian, q);
 }
