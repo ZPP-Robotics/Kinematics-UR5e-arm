@@ -375,3 +375,28 @@ void jacobian_elbow_joint(double *jacobian, double *q) {
   q[0] += ur_kinematics::PI;
   ur_kinematics::jacobian_elbow_joint(jacobian, q);
 }
+
+int inverse_kinematics_with_constraints(double *q_sols, double x, double y, double z) {
+  // TODO
+}
+
+double* inverse_kinematics_by_max(double x, double y, double z) {
+  double q_sols[8 * 6];
+  int num_sols = inverse_kinematics(q_sols, x, y, z);
+
+  int max_id = 0;
+  double max_angle = q_sols[0];
+
+  for (int i = 0; i < num_sols; i++) {
+    if (max_angle < q_sols[i * 6 + 1]) {
+      max_id = i;
+      max_angle = q_sols[i];
+    }
+  }
+
+  double* q_sol = new double[6];
+  for(auto i = 0; i < 6; i++)
+    q_sol[i] = q_sols[max_id * 6 + i];
+  
+  return q_sol;
+}

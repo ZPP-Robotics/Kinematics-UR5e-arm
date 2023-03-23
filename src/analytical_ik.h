@@ -11,6 +11,10 @@ int inverse_kinematics_2PI(double *q_sols, double x, double y, double z);
 
 int inverse_kinematics(double *q_sols, double x, double y, double z);
 
+int inverse_kinematics_with_constraints(double *q_sols, double x, double y, double z);
+
+double* inverse_kinematics_by_max(double x, double y, double z);
+
 void joint_jacobian(double *jacobian, double *q);
 
 void jacobian_elbow_joint(double *jacobian, double *q);
