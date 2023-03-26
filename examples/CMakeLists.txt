@@ -44,3 +44,8 @@ target_link_libraries(inverse_kinematics_mujoco analytical_ik)
 target_link_libraries(inverse_kinematics_mujoco glfw)
 target_link_libraries(inverse_kinematics_mujoco mujoco)
 target_link_libraries(inverse_kinematics_mujoco armadillo)
+
+add_executable(check_jacob check_jacob.cpp)
+target_link_libraries(check_jacob analytical_ik)
+target_link_libraries(check_jacob armadillo)
+
