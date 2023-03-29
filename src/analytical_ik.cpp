@@ -49,6 +49,31 @@ namespace ur_kinematics {
     *T = 0.0; T++; *T = 0.0; T++; *T = 0.0; T++; *T = 1.0;
   }
 
+  void forward_old(const double* q, double* T) {
+    double s1 = sin(*q), c1 = cos(*q); q++;
+    double q23 = *q, q234 = *q, s2 = sin(*q), c2 = cos(*q); q++;
+    double s3 = sin(*q), c3 = cos(*q); q23 += *q; q234 += *q; q++;
+    double s4 = sin(*q), c4 = cos(*q); q234 += *q; q++;
+    double s5 = sin(*q), c5 = cos(*q); q++;
+    double s6 = sin(*q), c6 = cos(*q); 
+    double s23 = sin(q23), c23 = cos(q23);
+    double s234 = sin(q234), c234 = cos(q234);
+    *T = c234*c1*s5 - c5*s1; T++;
+    *T = c6*(s1*s5 + c234*c1*c5) - s234*c1*s6; T++;
+    *T = -s6*(s1*s5 + c234*c1*c5) - s234*c1*c6; T++;
+    *T = d6*c234*c1*s5 - a3*c23*c1 - a2*c1*c2 - d6*c5*s1 - d5*s234*c1 - d4*s1; T++;
+    *T = c1*c5 + c234*s1*s5; T++;
+    *T = -c6*(c1*s5 - c234*c5*s1) - s234*s1*s6; T++;
+    *T = s6*(c1*s5 - c234*c5*s1) - s234*c6*s1; T++;
+    *T = d6*(c1*c5 + c234*s1*s5) + d4*c1 - a3*c23*s1 - a2*c2*s1 - d5*s234*s1; T++;
+    *T = -s234*s5; T++;
+    *T = -c234*s6 - s234*c5*c6; T++;
+    *T = s234*c5*s6 - c234*c6; T++;
+    *T = d1 + a3*s23 + a2*s2 - d5*(c23*c4 - s23*s4) - d6*s5*(c23*s4 + s23*c4); T++;
+    *T = 0.0; T++; *T = 0.0; T++; *T = 0.0; T++; *T = 1.0;
+  }
+
+
   void forward_6_back(const double* q, double* T) {
     const double d6_neg_div_2 = d6 / -2.0;
 
@@ -146,15 +171,170 @@ namespace ur_kinematics {
     *T = 0.0; T++; *T = 0.0; T++; *T = 0.0; T++; *T = 1.0;
   }
 
+  void forward_matrix(const double* q, double* T) {
+    const double c1 = cos(q[0]);
+    const double c2 = cos(q[1]);
+    const double c3 = cos(q[2]);
+    const double c4 = cos(q[3]);
+    const double c5 = cos(q[4]);
+    const double c6 = cos(q[5]);
+
+    const double s1 = sin(q[0]);
+    const double s2 = sin(q[1]);
+    const double s3 = sin(q[2]);
+    const double s4 = sin(q[3]);
+    const double s5 = sin(q[4]);
+    const double s6 = sin(q[5]);
+
+    const double s23 = sin(q[1] + q[2]);
+    const double c23 = cos(q[1] + q[2]);
+
+    const double s234 = sin(q[1] + q[2] + q[3]);
+    const double c234 = cos(q[1] + q[2] + q[3]);
+
+    double T00 = c1*c234*c5*c6 + c6*s1*s5 - c1*s234*s6;
+    double T01 = -c1*c234*c5*s6 - s1*s5*s6 - c1*c6*s234;
+    double T02 = -c1*c234*s5 + c5*s1;
+    
+    double T10 = c234*c5*c6*s1 - c1*c6*s5 - s1*s234*s6;
+    double T11 = -c234*c5*s1*c6 + c5*s5*s6 - c6*s1*s234;
+    double T12 = -c234*s1*s5 - c1*c5;
+
+    double T20 = c5*c6*s234 + c234*s6;
+    double T21 = -c5*c6*s234 + c234*c6;
+    double T22 = -s234*s5;
+
+    double px = -c1*c234*s5*d6 + c5*s1*d6 + c1*c234*d5 + s1*d4 + a2*c1*c2 + a3*c1*c23;  
+    double py = -c234*s1*s5*d6 - c1*c5*d6 + s1*s234*d5 - c1*d4 + a2*c2*s1 + a3*c23*s1;
+    double pz = -s234*s5*d6 - c234*d5 + a2*s2 + a3*s23 + d1;
+    
+    T[0*4 + 0] = T00; T[0*4 + 1] = T01; T[0*4 + 2] = T02; T[0*4 + 3] = px; 
+    T[1*4 + 0] = T10; T[1*4 + 1] = T11; T[1*4 + 2] = T12; T[1*4 + 3] = py;
+    T[2*4 + 0] = T20; T[2*4 + 1] = T21; T[2*4 + 2] = T22; T[2*4 + 3] = pz;
+    T[3*4 + 0] = 0.0; T[3*4 + 1] = 0.0; T[3*4 + 2] = 0.0; T[3*4 + 3] = 1.0;
+  }
+
+  bool is_equal(const double* T1, const double* T2) {
+    for (int i = 0; i < 16; i++) {
+      if (fabs(T1[i] - T2[i]) > 1e-6) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // int inverse(const double* T, double* q) {
+  //   const double c1 = cos(q[0]);
+  //   const double c2 = cos(q[1]);
+  //   const double c3 = cos(q[2]);
+  //   const double c4 = cos(q[3]);
+  //   const double c5 = cos(q[4]);
+  //   const double c6 = cos(q[5]);
+
+  //   const double s1 = sin(q[0]);
+  //   const double s2 = sin(q[1]);
+  //   const double s3 = sin(q[2]);
+  //   const double s4 = sin(q[3]);
+  //   const double s5 = sin(q[4]);
+  //   const double s6 = sin(q[5]);
+
+  //   const double s23 = sin(q[1] + q[2]);
+  //   const double c23 = cos(q[1] + q[2]);
+
+  //   const double s234 = sin(q[1] + q[2] + q[3]);
+  //   const double c234 = cos(q[1] + q[2] + q[3]);
+
+  //   int num_sols = 0;
+
+  //   double T00 = *T; T++; double T01 = *T; double T02 = *T; T++; T++; double px = *T; T++; 
+  //   double T10 = *T; T++; double T11 = *T; double T12 = *T; T++; T++; double py = *T; T++; 
+  //   double T20 = *T; T++; double T21 = *T; double T22 = *T; T++; T++; double pz = *T;
+
+  //   double A1 = px - d6*T02;
+  //   double B1 = d6*T12 - py;
+
+  //   double Kc = px*c1 + py*s1 + c234*s5*d6 - d5*s234;
+  //   double Ks = pz - d1 + c234*d5 + s234*s5*d6;
+
+  //   double q1[2];
+  //   q1[0] = atan2(A1, B1) + atan2(sqrt(A1*A1 + B1*B1 - d4*d4), d4);
+  //   q1[1] = atan2(A1, B1) - atan2(sqrt(A1*A1 + B1*B1 - d4*d4), d4);
+
+  //   double q2 = atan2(Ks, Kc) - atan2(a3*s3, (a3*c3 + a2));
+
+  //   double q3[2];
+  //   q3[0] = atan2(s2, s3);
+  //   q3[1] = -atan2(s2, s3);
+
+  //   double q5[2];
+  //   q5[0] = atan2(s5, c5);
+  //   q5[1] = -atan2(s5, c5);
+
+  //   double q6 = atan2(s6, c6);
+
+  //   double q4[2];
+  //   q4[0] = atan2(T21, T20) - q2 - q3[0];
+  //   q4[1] = atan2(T21, T20) - q2 - q3[1];
+
+  //   // check for solutions
+  //   for (int i = 0; i < 2; i++) {
+  //     for (int j = 0; j < 2; j++) {
+  //       for (int k = 0; k < 2; k++) {
+  //         for (int l = 0; l < 2; l++) {
+  //           double q[6] = {q1[i], q2, q3[j], q4[k], q5[l], q6};
+  //           double T_sol[16];
+  //           forward(q, T_sol);
+  //           if (is_equal(T, T_sol)) {
+  //             q[num_sols*6 + 0] = q1[i];
+  //             q[num_sols*6 + 1] = q2;
+  //             q[num_sols*6 + 2] = q3[j];
+  //             q[num_sols*6 + 3] = q4[k];
+  //             q[num_sols*6 + 4] = q5[l];
+  //             q[num_sols*6 + 5] = q6;
+  //             num_sols++;
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+
+  // printf("num_sols: %d", num_sols);
+    // for (int i = 0; i < 2; i++) {
+    //   for (int k = 0; k < 2; k++) {
+    //     if (fabs(q2) < ZERO_THRESH)
+    //       q2 = 0.0;
+    //     else if (q2 < 0.0) 
+    //       q2 += 2.0 * PI;
+
+    //     if (fabs(q4[k]) < ZERO_THRESH)
+    //       q4[k] = 0.0;
+    //     else if (q4[k] < 0.0) 
+    //       q4[k] += 2.0 * PI;
+
+    //     q[num_sols * 6 + 0] = q1[i];    q[num_sols * 6 + 1] = q2; 
+    //     q[num_sols * 6 + 2] = q3[k];    q[num_sols * 6 + 3] = q4[k]; 
+    //     q[num_sols * 6 + 4] = q5[k];    q[num_sols * 6 + 5] = q6; 
+    //     num_sols++;
+    //   }
+    // }
+
+
+    // return num_sols;
+  // }
+
   int inverse(const double* T, double* q_sols,  double q6_des=0.0) {
     int num_sols = 0;
     // double T02 = -*T; T++; double T00 =  *T; T++; double T01 =  *T; T++; double T03 = -*T; T++; 
     // double T12 = -*T; T++; double T10 =  *T; T++; double T11 =  *T; T++; double T13 = -*T; T++; 
     // double T22 =  *T; T++; double T20 = -*T; T++; double T21 = -*T; T++; double T23 =  *T;
 
-    double T02 = *T; T++; double T00 = -*T; T++; double T01 = -*T; T++; double T03 = *T; T++; 
-    double T12 = *T; T++; double T10 = -*T; T++; double T11 = -*T; T++; double T13 = *T; T++; 
-    double T22 = -*T; T++; double T20 = *T; T++; double T21 = *T; T++; double T23 = -*T;
+    // double T02 = *T; T++; double T00 = -*T; T++; double T01 = -*T; T++; double T03 = *T; T++; 
+    // double T12 = *T; T++; double T10 = -*T; T++; double T11 = -*T; T++; double T13 = *T; T++; 
+    // double T22 = -*T; T++; double T20 = *T; T++; double T21 = *T; T++; double T23 = -*T;
+
+    double T00 = *T; T++; double T01 = *T; double T02 = *T; T++; T++; double T03 = *T; T++; 
+    double T10 = *T; T++; double T11 = *T; double T12 = *T; T++; T++; double T13 = *T; T++; 
+    double T20 = *T; T++; double T21 = *T; double T22 = *T; T++; T++; double T23 = *T;
 
     // shoulder rotate joint (q1)
     double q1[2];
@@ -587,10 +767,10 @@ int inverse_kinematics(double *q_sols, double x, double y, double z) {
   for(auto i = 0; i < 16; i++)
     T[i] = 0.0;
 
-  // ur_kinematics::forward(q, T);
-  double eerot[9] = {1, 0, 0, 0, 1, 0, 0, 0, 1};
-  for(auto i = 0; i < 9; i++)
-    T[i/3 * 4 + i % 3] = eerot[i];
+  ur_kinematics::forward_matrix(q, T);
+  // double eerot[9] = {1, 0, 0, 0, 1, 0, 0, 0, 1};
+  // for(auto i = 0; i < 9; i++)
+    // T[i/3 * 4 + i % 3] = eerot[i];
 
   std::tuple<double, double, double> target = {x, y, z};
   T[0*4 + 3] = std::get<0>(target);
