@@ -7,9 +7,13 @@ add_subdirectory(src)
 
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
   option(Kinematics_UR5e_arm_BUILD_EXAMPLES "Build examples" ON)
+  option(Kinematics_UR5e_arm_BUILD_TESTS "Build tests" ON)
 
   if(Kinematics_UR5e_arm_BUILD_EXAMPLES)
     add_subdirectory(examples)  
+  endif()
+  if(Kinematics_UR5e_arm_BUILD_TESTS)
+    add_subdirectory(tests)
   endif()
 
 endif()

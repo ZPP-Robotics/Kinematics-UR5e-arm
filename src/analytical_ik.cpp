@@ -49,6 +49,85 @@ namespace ur_kinematics {
     *T = 0.0; T++; *T = 0.0; T++; *T = 0.0; T++; *T = 1.0;
   }
 
+  void forward_6_back(const double* q, double* T) {
+    const double d6_neg_div_2 = d6 / -2.0;
+
+    double s1 = sin(*q), c1 = cos(*q); q++;
+    double q23 = *q, q234 = *q, s2 = sin(*q), c2 = cos(*q); q++;
+    double s3 = sin(*q), c3 = cos(*q); q23 += *q; q234 += *q; q++;
+    double s4 = sin(*q), c4 = cos(*q); q234 += *q; q++;
+    double s5 = sin(*q), c5 = cos(*q); q++;
+    double s6 = sin(*q), c6 = cos(*q); 
+    double s23 = sin(q23), c23 = cos(q23);
+    double s234 = sin(q234), c234 = cos(q234);
+
+    *T = (s1*s2 + c1*c5*c234)*c6 - s6*s234*c1; T++;
+    *T = -(s1*s5 + c1*c5*c234)*s6 - s234*c1*c6; T++;
+    *T = s1*s5 - s5*c1*c234; T++;
+    *T = a2*c1*c2 + a3*c1*c23 + d4*s1 + d5*s234*c1 + d6_neg_div_2*s1*c5 - d6_neg_div_2*s5*c1*c234; T++;
+
+    *T = (s1*c5*c234 - s5*c1) * c6 - s1*s6*s234; T++;
+    *T = (-s1*c5*c234 + s5*c1)*c6 - s1*s234*c6; T++;
+    *T = -s1*s5*c234 - c1*c5; T++;
+    *T = a2*s1*c2 + a3*s1*c23 - d4*c1 + d5*s1*s234 - d6_neg_div_2*s1*s5*c234 - d6_neg_div_2*c1*c5; T++;
+
+    *T = s6*c234 + s234*c5*c6; T++;
+    *T = -s6*s234*c5 + c6*c234; T++;
+    *T = -s5*s234; T++;
+    *T = a2*s2 + a3*s23 + d1 - d5*c234 - d6_neg_div_2*s5*s234; T++;
+
+    *T = 0.0; T++; *T = 0.0; T++; *T = 0.0; T++; *T = 1.0;
+  }
+
+  void forward_4(const double* q, double* T) {
+    double s1 = sin(*q), c1 = cos(*q); q++;
+    double q23 = *q, q234 = *q, s2 = sin(*q), c2 = cos(*q); q++;
+    double s3 = sin(*q), c3 = cos(*q); q23 += *q; q234 += *q; q++;
+    double s4 = sin(*q), c4 = cos(*q); q234 += *q; q++;
+    double s5 = sin(*q), c5 = cos(*q); q++;
+    double s6 = sin(*q), c6 = cos(*q); 
+    double s23 = sin(q23), c23 = cos(q23);
+    double s234 = sin(q234), c234 = cos(q234);
+
+    *T = c1*c234; T++;
+    *T = s1; T++;
+    *T = s234*c1; T++;
+    *T = a2*c1*c2 + a3*c1*c23 + d4*s1; T++;
+    *T = s1*c234; T++;
+    *T = -c1; T++;
+    *T = s1*s234; T++;
+    *T = a2*s1*c2 + a3*s1*c23 - d4*c1; T++;
+    *T = s234; T++;
+    *T = 0.0; T++;
+    *T = -c234; T++;
+    *T = a2*s2 + a3*s23 + d1; T++;
+    *T = 0.0; T++; *T = 0.0; T++; *T = 0.0; T++; *T = 1.0;
+  }
+
+  void forward_3(const double *q, double *T) {
+    double s1 = sin(*q), c1 = cos(*q); q++;
+    double q23 = *q, q234 = *q, s2 = sin(*q), c2 = cos(*q); q++;
+    double s3 = sin(*q), c3 = cos(*q); q23 += *q; q234 += *q; q++;
+    double s4 = sin(*q), c4 = cos(*q); q234 += *q; q++;
+    double s5 = sin(*q), c5 = cos(*q); q++;
+    double s6 = sin(*q), c6 = cos(*q); 
+    double s23 = sin(q23), c23 = cos(q23);
+
+    *T = c1*c23; T++;
+    *T = -s23*c1; T++;
+    *T = s1; T++;
+    *T = c1*(a2*c2 + a3*c23); T++;
+    *T = c23*s1; T++;
+    *T = -s1*s23; T++;
+    *T = -c1; T++;
+    *T = s1*(a2*c2 + a3*c23); T++;
+    *T = s23; T++;
+    *T = c23; T++;
+    *T = 0.0; T++;
+    *T = a2*s2 + a3*s23 + d1; T++;
+    *T = 0.0; T++; *T = 0.0; T++; *T = 0.0; T++; *T = 1.0;
+  }
+
   void forward_elbow_joint(const double* q, double* T) {
     const double s1 = sin(*q), c1 = cos(*q); q++; 
     const double s2 = sin(*q), c2 = cos(*q); q++;
@@ -300,6 +379,126 @@ namespace ur_kinematics {
     jacobian[2 * 6 + 5] = 0;
 
   }
+
+  void jacobian_6_back(double *jacobian, double *q) {
+    const double d6_neg_div_2 = d6 / -2.0;
+
+    const double cos1 = cos(q[0]);
+    const double cos2 = cos(q[1]);
+    const double cos3 = cos(q[2]);
+    const double cos4 = cos(q[3]);
+    const double cos5 = cos(q[4]);
+
+    const double sin1 = sin(q[0]);
+    const double sin2 = sin(q[1]);
+    const double sin3 = sin(q[2]);
+    const double sin4 = sin(q[3]);
+    const double sin5 = sin(q[4]);
+
+    const double sin23 = sin(q[1] + q[2]);
+    const double cos23 = cos(q[1] + q[2]);
+
+    const double sin234 = sin(q[1] + q[2] + q[3]);
+    const double cos234 = cos(q[1] + q[2] + q[3]);
+
+    jacobian[0 * 6 + 0] = -a2*sin1*cos2 - a3*sin1*cos23 + d4*cos1 - d5*sin1*sin234 + d6_neg_div_2*sin1*sin5*cos234 + d6_neg_div_2*cos1*cos5;
+    jacobian[0 * 6 + 1] = (-a2*sin2 - a3*sin23 + d5*cos234 + d6_neg_div_2*sin5*sin234)*cos1;
+    jacobian[0 * 6 + 2] = (-a3*sin23 + d5*cos234 + d6_neg_div_2*sin5*sin234)*cos1;
+    jacobian[0 * 6 + 3] = (d5*cos234 + d6_neg_div_2*sin5*sin234)*cos1;
+    jacobian[0 * 6 + 4] = -d6_neg_div_2*(sin1*sin5 + cos1*cos5*cos234);
+    jacobian[0 * 6 + 5] = 0;
+
+    jacobian[1 * 6 + 0] = a2*cos1*cos2 + a3*cos1*cos23 + d4*sin1 + d5*sin234*cos1 + d6_neg_div_2*sin1*cos5 - d6_neg_div_2*sin5*cos1*cos234;
+    jacobian[1 * 6 + 1] = (-a2*sin2 - a3*sin23 + d5*cos234 + d6_neg_div_2*sin5*sin234)*sin1;
+    jacobian[1 * 6 + 2] = (-a3*sin23 + d5*cos234 + d6_neg_div_2*sin5*sin234)*sin1;
+    jacobian[1 * 6 + 3] = (d5*cos234 + d6_neg_div_2*sin5*sin234)*sin1;
+    jacobian[1 * 6 + 4] = d6_neg_div_2*(-sin1*cos5*cos234 + sin5*cos1);
+    jacobian[1 * 6 + 5] = 0;
+
+    jacobian[2 * 6 + 0] = 0;
+    jacobian[2 * 6 + 1] = a2*cos2 + a3*cos23 + d5*sin234 - d6_neg_div_2*sin5*cos234;
+    jacobian[2 * 6 + 2] = a3*cos23 + d5*sin234 - d6_neg_div_2*sin5*cos234;
+    jacobian[2 * 6 + 3] = d5*sin234 - d6_neg_div_2*sin5*cos234;
+    jacobian[2 * 6 + 4] = -d6_neg_div_2*sin234*cos5;
+    jacobian[2 * 6 + 5] = 0;
+  }
+
+  void jacobian_4(double *jacobian, double *q) {
+    const double cos1 = cos(q[0]);
+    const double cos2 = cos(q[1]);
+    const double cos3 = cos(q[2]);
+    const double cos4 = cos(q[3]);
+    const double cos5 = cos(q[4]);
+
+    const double sin1 = sin(q[0]);
+    const double sin2 = sin(q[1]);
+    const double sin3 = sin(q[2]);
+    const double sin4 = sin(q[3]);
+    const double sin5 = sin(q[4]);
+
+    const double sin23 = sin(q[1] + q[2]);
+    const double cos23 = cos(q[1] + q[2]);
+
+    jacobian[0 * 6 + 0] = -a2*sin1*cos2 - a3*sin1*cos23 + d4*cos1;
+    jacobian[0 * 6 + 1] = -a2*sin2*cos1 - a3*sin23*cos1;
+    jacobian[0 * 6 + 2] = -a3*sin23*cos1;
+    jacobian[0 * 6 + 3] = 0;
+    jacobian[0 * 6 + 4] = 0;
+    jacobian[0 * 6 + 5] = 0;
+
+    jacobian[1 * 6 + 0] = a2*cos1*cos2 + a3*cos1*cos23 + d4*sin1;
+    jacobian[1 * 6 + 1] = -a2*sin2*sin1 - a3*sin23*sin1;
+    jacobian[1 * 6 + 2] = -a3*sin23*sin1;
+    jacobian[1 * 6 + 3] = 0;
+    jacobian[1 * 6 + 4] = 0;  
+    jacobian[1 * 6 + 5] = 0;
+
+    jacobian[2 * 6 + 0] = 0;
+    jacobian[2 * 6 + 1] = a2*cos2 + a3*cos23;
+    jacobian[2 * 6 + 2] = a3*cos23;
+    jacobian[2 * 6 + 3] = 0;
+    jacobian[2 * 6 + 4] = 0;
+    jacobian[2 * 6 + 5] = 0;
+  }
+
+  void jacobian_3(double *jacobian, double *q) {
+    const double cos1 = cos(q[0]);
+    const double cos2 = cos(q[1]);
+    const double cos3 = cos(q[2]);
+    const double cos4 = cos(q[3]);
+    const double cos5 = cos(q[4]);
+
+    const double sin1 = sin(q[0]);
+    const double sin2 = sin(q[1]);
+    const double sin3 = sin(q[2]);
+    const double sin4 = sin(q[3]);
+    const double sin5 = sin(q[4]);
+
+    const double sin23 = sin(q[1] + q[2]);
+    const double cos23 = cos(q[1] + q[2]);
+
+    jacobian[0 * 6 + 0] = -(a2*cos2 + a3*cos23) * sin1;
+    jacobian[0 * 6 + 1] = (-a2 * sin2 - a3 * sin23) * cos1;
+    jacobian[0 * 6 + 2] = -a3*sin23*cos1;
+    jacobian[0 * 6 + 3] = 0;
+    jacobian[0 * 6 + 4] = 0;
+    jacobian[0 * 6 + 5] = 0;
+
+    jacobian[1 * 6 + 0] = (a2*cos2 + a3*cos23) * cos1;
+    jacobian[1 * 6 + 1] = (-a2*sin2 - a3*sin23)*sin1;
+    jacobian[1 * 6 + 2] = -a3*sin1*sin23;
+    jacobian[1 * 6 + 3] = 0;
+    jacobian[1 * 6 + 4] = 0;
+    jacobian[1 * 6 + 5] = 0;
+
+    jacobian[2 * 6 + 0] = 0;
+    jacobian[2 * 6 + 1] = a2*cos2 + a3*cos23;
+    jacobian[2 * 6 + 2] = a3*cos23;
+    jacobian[2 * 6 + 3] = 0;
+    jacobian[2 * 6 + 4] = 0;
+    jacobian[2 * 6 + 5] = 0;
+  }
+
 };
 
 std::tuple<double, double, double> forward_kinematics(double *q) {
@@ -314,14 +513,47 @@ std::tuple<double, double, double> forward_kinematics(double *q) {
   return {x, y, z};
 }
 
+std::tuple<double, double, double> forward_kinematics_6_back(double *q) {
+  double *T = new double[16];
+  for(auto i = 0; i < 16; i++)
+    T[i] = 0.0;
+
+  ur_kinematics::forward_6_back(q, T);
+
+  double x = T[0*4 + 3], y = T[1*4 + 3], z = T[2*4 + 3];
+  delete[] T;
+  return {x, y, z};
+}
+
+std::tuple<double, double, double> forward_kinematics_4(double *q) {
+  double *T = new double[16];
+  for(auto i = 0; i < 16; i++)
+    T[i] = 0.0;
+
+  ur_kinematics::forward_4(q, T);
+
+  double x = T[0*4 + 3], y = T[1*4 + 3], z = T[2*4 + 3];
+  delete[] T;
+  return {x, y, z};
+}
+
+std::tuple<double, double, double> forward_kinematics_3(double *q) {
+  double *T = new double[16];
+  for(auto i = 0; i < 16; i++)
+    T[i] = 0.0;
+
+  ur_kinematics::forward_3(q, T);
+
+  double x = T[0*4 + 3], y = T[1*4 + 3], z = T[2*4 + 3];
+  delete[] T;
+  return {x, y, z};
+}
+
 std::tuple<double, double, double> forward_kinematics_elbow_joint(double *q) {
   double *T = new double[16];
   for(auto i = 0; i < 16; i++)
     T[i] = 0.0;
 
-  // Magic!
-  // Need to add PI to q1
-  // q[0] += ur_kinematics::PI;
   ur_kinematics::forward_elbow_joint(q, T);
 
   double x = T[0*4 + 3], y = T[1*4 + 3], z = T[2*4 + 3];
@@ -375,6 +607,18 @@ int inverse_kinematics(double *q_sols, double x, double y, double z) {
 
 void joint_jacobian(double *jacobian, double *q) {
   ur_kinematics::jacobian(jacobian, q);
+}
+
+void joint_jacobian_6_back(double *jacobian, double *q) {
+  ur_kinematics::jacobian_6_back(jacobian, q);
+}
+
+void joint_jacobian_4(double *jacobian, double *q) {
+  ur_kinematics::jacobian_4(jacobian, q);
+}
+
+void joint_jacobian_3(double *jacobian, double *q) {
+  ur_kinematics::jacobian_3(jacobian, q);
 }
 
 void jacobian_elbow_joint(double *jacobian, double *q) {
