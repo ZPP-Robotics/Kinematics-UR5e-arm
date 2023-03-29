@@ -328,18 +328,10 @@ namespace ur_kinematics {
     double T12 = -*T; T++; double T10 =  *T; T++; double T11 =  *T; T++; double T13 = -*T; T++; 
     double T22 =  *T; T++; double T20 = -*T; T++; double T21 = -*T; T++; double T23 =  *T;
 
-    // double T02 = T[0];
-    // double T00 = -T[1];
-    // double T01 = -T[2];
-    // double T03 = T[3];
-    // double T12 = T[4];
-    // double T10 = -T[5];
-    // double T11 = -T[6];
-    // double T13 = T[7];
-    // double T22 = -T[8];
-    // double T20 = T[9];
-    // double T21 = T[10];
-    // double T23 = -T[11];
+      // rotate by PI along z-axis
+    T00 = -T00; double T01_new = -T01; double T02_new = T02;
+    T10 = -T10; double T11_new = -T11; double T12_new = T12;
+    T20 = -T20; double T21_new = -T21; double T22_new = T22;
 
 
     // double T00 = *T; T++; double T01 = *T; double T02 = *T; T++; T++; double T03 = *T; T++; 
