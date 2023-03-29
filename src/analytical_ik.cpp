@@ -324,22 +324,22 @@ namespace ur_kinematics {
 
   int inverse(const double* T, double* q_sols,  double q6_des=0.0) {
     int num_sols = 0;
-    // double T02 = -*T; T++; double T00 =  *T; T++; double T01 =  *T; T++; double T03 = -*T; T++; 
-    // double T12 = -*T; T++; double T10 =  *T; T++; double T11 =  *T; T++; double T13 = -*T; T++; 
-    // double T22 =  *T; T++; double T20 = -*T; T++; double T21 = -*T; T++; double T23 =  *T;
+    double T02 = -*T; T++; double T00 =  *T; T++; double T01 =  *T; T++; double T03 = -*T; T++; 
+    double T12 = -*T; T++; double T10 =  *T; T++; double T11 =  *T; T++; double T13 = -*T; T++; 
+    double T22 =  *T; T++; double T20 = -*T; T++; double T21 = -*T; T++; double T23 =  *T;
 
-    double T02 = T[0];
-    double T00 = -T[1];
-    double T01 = -T[2];
-    double T03 = T[3];
-    double T12 = T[4];
-    double T10 = -T[5];
-    double T11 = -T[6];
-    double T13 = T[7];
-    double T22 = -T[8];
-    double T20 = T[9];
-    double T21 = T[10];
-    double T23 = -T[11];
+    // double T02 = T[0];
+    // double T00 = -T[1];
+    // double T01 = -T[2];
+    // double T03 = T[3];
+    // double T12 = T[4];
+    // double T10 = -T[5];
+    // double T11 = -T[6];
+    // double T13 = T[7];
+    // double T22 = -T[8];
+    // double T20 = T[9];
+    // double T21 = T[10];
+    // double T23 = -T[11];
 
 
     // double T00 = *T; T++; double T01 = *T; double T02 = *T; T++; T++; double T03 = *T; T++; 
@@ -794,6 +794,10 @@ int inverse_kinematics(double *q_sols, double x, double y, double z) {
   for (int i = 0; i < 6 * num_sols; ++i) {
     if (q_sols[i] >= ur_kinematics::PI)
         q_sols[i] -= 2.0 * ur_kinematics::PI;
+  }
+
+  for (int i = 0; i < num_sols; ++i) {
+    q_sols[i * 6 + 0] += ur_kinematics::PI;
   }
 
   return num_sols;
