@@ -324,17 +324,17 @@ namespace ur_kinematics {
 
   int inverse(const double* T, double* q_sols,  double q6_des=0.0) {
     int num_sols = 0;
-    // double T02 = -*T; T++; double T00 =  *T; T++; double T01 =  *T; T++; double T03 = -*T; T++; 
-    // double T12 = -*T; T++; double T10 =  *T; T++; double T11 =  *T; T++; double T13 = -*T; T++; 
-    // double T22 =  *T; T++; double T20 = -*T; T++; double T21 = -*T; T++; double T23 =  *T;
+    double T02 = -*T; T++; double T00 =  *T; T++; double T01 =  *T; T++; double T03 = -*T; T++; 
+    double T12 = -*T; T++; double T10 =  *T; T++; double T11 =  *T; T++; double T13 = -*T; T++; 
+    double T22 =  *T; T++; double T20 = -*T; T++; double T21 = -*T; T++; double T23 =  *T;
 
     // double T02 = *T; T++; double T00 = -*T; T++; double T01 = -*T; T++; double T03 = *T; T++; 
     // double T12 = *T; T++; double T10 = -*T; T++; double T11 = -*T; T++; double T13 = *T; T++; 
     // double T22 = -*T; T++; double T20 = *T; T++; double T21 = *T; T++; double T23 = -*T;
 
-    double T00 = *T; T++; double T01 = *T; double T02 = *T; T++; T++; double T03 = *T; T++; 
-    double T10 = *T; T++; double T11 = *T; double T12 = *T; T++; T++; double T13 = *T; T++; 
-    double T20 = *T; T++; double T21 = *T; double T22 = *T; T++; T++; double T23 = *T;
+    // double T00 = *T; T++; double T01 = *T; double T02 = *T; T++; T++; double T03 = *T; T++; 
+    // double T10 = *T; T++; double T11 = *T; double T12 = *T; T++; T++; double T13 = *T; T++; 
+    // double T20 = *T; T++; double T21 = *T; double T22 = *T; T++; T++; double T23 = *T;
 
     // shoulder rotate joint (q1)
     double q1[2];
