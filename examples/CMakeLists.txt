@@ -52,4 +52,6 @@ target_link_libraries(check_jacob armadillo)
 add_executable(mujoco_jac mujoco_jac.cpp)
 target_link_libraries(mujoco_jac mujoco)
 
+add_executable(check_forward check_forward.cpp)
+target_link_libraries(check_forward analytical_ik)
 
