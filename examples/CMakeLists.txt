@@ -49,6 +49,9 @@ add_executable(check_jacob check_jacob.cpp)
 target_link_libraries(check_jacob analytical_ik)
 target_link_libraries(check_jacob armadillo)
 
+add_executable(check_inverse check_inverse.cpp)
+target_link_libraries(check_inverse analytical_ik)
+
 add_executable(mujoco_jac mujoco_jac.cpp)
 target_link_libraries(mujoco_jac mujoco)
 

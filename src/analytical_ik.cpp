@@ -21,6 +21,30 @@ namespace ur_kinematics {
     const double d6 = 0.0996;
   }
 
+    void forward_old(const double* q, double* T) {
+      double s1 = sin(*q), c1 = cos(*q); q++;
+      double q23 = *q, q234 = *q, s2 = sin(*q), c2 = cos(*q); q++;
+      double s3 = sin(*q), c3 = cos(*q); q23 += *q; q234 += *q; q++;
+      double s4 = sin(*q), c4 = cos(*q); q234 += *q; q++;
+      double s5 = sin(*q), c5 = cos(*q); q++;
+      double s6 = sin(*q), c6 = cos(*q); 
+      double s23 = sin(q23), c23 = cos(q23);
+      double s234 = sin(q234), c234 = cos(q234);
+      *T = c234*c1*s5 - c5*s1; T++;
+      *T = c6*(s1*s5 + c234*c1*c5) - s234*c1*s6; T++;
+      *T = -s6*(s1*s5 + c234*c1*c5) - s234*c1*c6; T++;
+      *T = d6*c234*c1*s5 - a3*c23*c1 - a2*c1*c2 - d6*c5*s1 - d5*s234*c1 - d4*s1; T++;
+      *T = c1*c5 + c234*s1*s5; T++;
+      *T = -c6*(c1*s5 - c234*c5*s1) - s234*s1*s6; T++;
+      *T = s6*(c1*s5 - c234*c5*s1) - s234*c6*s1; T++;
+      *T = d6*(c1*c5 + c234*s1*s5) + d4*c1 - a3*c23*s1 - a2*c2*s1 - d5*s234*s1; T++;
+      *T = -s234*s5; T++;
+      *T = -c234*s6 - s234*c5*c6; T++;
+      *T = s234*c5*s6 - c234*c6; T++;
+      *T = d1 + a3*s23 + a2*s2 - d5*(c23*c4 - s23*s4) - d6*s5*(c23*s4 + s23*c4); T++;
+      *T = 0.0; T++; *T = 0.0; T++; *T = 0.0; T++; *T = 1.0;
+    }
+
   void forward(const double* q, double* T) {
     double s1 = sin(*q), c1 = cos(*q); q++;
     double q23 = *q, q234 = *q, s2 = sin(*q), c2 = cos(*q); q++;
@@ -577,21 +601,34 @@ int inverse_kinematics_2PI(double *q_sols, double x, double y, double z) {
   return num_sols;
 }
 
+#include <iostream>
 int inverse_kinematics(double *q_sols, double x, double y, double z) {
-  double q[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   double *T = new double[16];
   for(auto i = 0; i < 16; i++)
     T[i] = 0.0;
 
-  // ur_kinematics::forward(q, T);
-  double eerot[9] = {1, 0, 0, 0, 1, 0, 0, 0, 1};
+  // ur_kinematics::forward_old(q, T);
+  // for(auto row = 0; row < 3; row++) {
+  //   for(auto col = 0; col < 3; col++) {
+  //     std::cout << T[row*4 + col] << " ";
+  //   }
+  //   std::cout << std::endl;
+  // }
+  double eerot[9] = {0, 0,  -1,  0, -1,  0,  -1, 0,  0};
   for(auto i = 0; i < 9; i++)
     T[i/3 * 4 + i % 3] = eerot[i];
 
   std::tuple<double, double, double> target = {x, y, z};
-  T[0*4 + 3] = std::get<0>(target);
-  T[1*4 + 3] = std::get<1>(target);
-  T[2*4 + 3] = std::get<2>(target);
+  T[0*4 + 3] = -std::get<0>(target);
+  T[1*4 + 3] = -std::get<1>(target);
+  T[2*4 + 3] = std::get<2>(target); 
+
+
+  // for(auto row = 0; row < 2; row++) {
+  //   for(auto col = 0; col < 4; col++) {
+  //     T[row*4 + col] *= -1;
+  //   }
+  // }
 
   int num_sols;
   num_sols = ur_kinematics::inverse(T, q_sols);
