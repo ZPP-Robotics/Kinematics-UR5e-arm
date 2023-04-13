@@ -5,6 +5,8 @@
 
 std::tuple<double, double, double> forward_kinematics(double *q);
 
+std::tuple<double, double, double> forward_kinematics_gripper(double *q);
+
 std::tuple<double, double, double> forward_kinematics_6_back(double *q);
 
 std::tuple<double, double, double> forward_kinematics_4(double *q);
@@ -18,6 +20,8 @@ int inverse_kinematics_2PI(double *q_sols, double x, double y, double z);
 int inverse_kinematics(double *q_sols, double x, double y, double z);
 
 void joint_jacobian(double *jacobian, double *q);
+
+void joint_jacobian_gripper(double *jacobian, double *q);
 
 void joint_jacobian_6_back(double *jacobian, double *q);
 
