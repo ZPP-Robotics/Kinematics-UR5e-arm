@@ -1,16 +1,17 @@
 # Kinematics for a UR5e arm
 
 ## Run simulation
- - <code>
-    mkdir budild </br>
-    cd budild </br>
-    cmake .. </br>
-  </code>
+ - run
 
+   ```
+    mkdir build
+    cd build
+    cmake .. 
  - execute 
-    <code>
+ 
+   ```
     ./examples/inverse_kinematics_mujoco [ur5e_model_file_path] [target coordinates in R^3]
-    </code>
+   ```
 
 
 ## Overview
