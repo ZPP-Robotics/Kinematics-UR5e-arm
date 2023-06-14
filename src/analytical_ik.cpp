@@ -20,7 +20,7 @@ namespace ur_kinematics {
     const double d5 = 0.0997;
     const double d6 = 0.0996;
 
-    const double d_gripper = 0.24;
+    const double d_gripper = 0.21;
 
     const double elbow_adjustment = 0.23; // = atan(15/d1) in radians to be more first angle centric
   }
